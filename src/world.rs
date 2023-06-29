@@ -17,9 +17,6 @@ pub enum Tile {
     Water,
 }
 
-impl Tile {
-}
-
 #[derive(Debug)]
 pub struct Chunk {
     pub tiles: Vec<Tile>
@@ -40,6 +37,7 @@ pub enum WorldGenerationSize {
     Tiny,
     Small,
     Medium,
+    Large,
 }
 
 impl World {
@@ -55,6 +53,7 @@ impl World {
             WorldGenerationSize::Tiny => 2,
             WorldGenerationSize::Small => 4,
             WorldGenerationSize::Medium => 8,
+            WorldGenerationSize::Large => 20,
         }
     }
 

@@ -1,3 +1,5 @@
+use std::{fmt::format, f32::MIN_EXP};
+
 use macroquad::prelude::*;
 use atlas_lookup::*;
 use assets::*;
@@ -14,18 +16,18 @@ async fn main() {
     let mut camera = make_camera();
 
     let world = World::new().generate_world(
-        WorldGenerationType::TileMess,
-        WorldGenerationSize::Small,
+        WorldGenerationType::WaterWorld,
+        WorldGenerationSize::Large,
     );
 
+    let mut camera_zoom_offset = 1.0;
 
     // Main Game loop
     loop {
         /* Update */
         camera.zoom = vec2(1.0 / screen_width() * TILE_SIZE, 1.0 / screen_height() * TILE_SIZE);
-        camera.zoom *= 0.2;
-        handle_camera_controls(&mut camera);
-
+        camera.zoom *= camera_zoom_offset;
+        handle_camera_controls(&mut camera, &mut camera_zoom_offset);
 
         /* Render */
         set_camera(&camera);
@@ -33,15 +35,18 @@ async fn main() {
 
         // UI
         set_default_camera(); // Sets camera to defualt camera, used for ui rendering.
-        draw_text(&get_fps().to_string(), 50.0, 50.0, 50.0, YELLOW);
+        draw_text(format!("FPS: {}", get_fps()).as_str(), 50.0, 50.0, 50.0, WHITE); // Draws fps
         next_frame().await;
     }
 }
 
 
 
-fn handle_camera_controls(camera: &mut Camera2D) {
+fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     let camera_speed = 100.0;
+    let zoom_speed: f32 = 0.01;
+    let mut max_camera_zoom = 0.1; // Max as in zoomed in, smaller number means wider view
+    let mut min_camera_zoom = 5.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
     if is_key_down(KeyCode::W) {
         camera.target.y += camera_speed * get_frame_time();
     }
@@ -55,8 +60,20 @@ fn handle_camera_controls(camera: &mut Camera2D) {
         camera.target.x += camera_speed * get_frame_time();
     }
 
+    let mouse_wheel_delta = mouse_wheel().1;
     if mouse_wheel().1 > 0.0 {
+        *zoom_offset *= zoom_speed * mouse_wheel_delta.abs();
+    }
+    if mouse_wheel().1 < 0.0 {
+        *zoom_offset /= zoom_speed * mouse_wheel_delta.abs();
+    }
 
+    // Normilize zoom
+    if zoom_offset > &mut min_camera_zoom {
+        *zoom_offset = min_camera_zoom;
+    }
+    if zoom_offset < &mut max_camera_zoom {
+        *zoom_offset = max_camera_zoom;
     }
 }
 
