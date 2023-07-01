@@ -14,7 +14,7 @@ async fn main() {
     let mut camera = make_camera();
 
     let world = World::new().generate_world(
-        WorldGenerationType::ChunkMess,  
+        WorldGenerationType::SimpleTerrain,  
         WorldGenerationSize::Small,
         1000
     );
