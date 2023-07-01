@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use macroquad::prelude::Camera2D;
 use rand::{Rng, SeedableRng};
 use rand::rngs::StdRng;
 
@@ -58,11 +59,11 @@ impl World {
     }
 
     // Populates a world with tiles, with diffrent world types able to be generated
-    pub fn generate_world(self, generation_type: WorldGenerationType, size: WorldGenerationSize) -> Self {
+    pub fn generate_world(self, generation_type: WorldGenerationType, size: WorldGenerationSize, seed: u32) -> Self {
         let chunks = match generation_type {
-            WorldGenerationType::WaterWorld => Self::generate_water_world(size),
-            WorldGenerationType::ChunkMess => Self::generate_chunk_mess_world(size),
-            WorldGenerationType::TileMess => Self::generate_tile_mess_world(size),
+            WorldGenerationType::WaterWorld => Self::generate_water_world(size, seed),
+            WorldGenerationType::ChunkMess => Self::generate_chunk_mess_world(size, seed),
+            WorldGenerationType::TileMess => Self::generate_tile_mess_world(size, seed),
         };
 
         return World { chunks };
@@ -74,7 +75,7 @@ impl World {
 impl World{
 
     // Generates world of just water tiles
-    fn generate_water_world(size: WorldGenerationSize) -> HashMap<ChunkPos, Chunk> {
+    fn generate_water_world(size: WorldGenerationSize, _seed: u32) -> HashMap<ChunkPos, Chunk> {
         let world_size = Self::get_size_from_type(size);
         let mut chunks = HashMap::new();
         for chunk_y in 0..world_size {
@@ -102,12 +103,11 @@ impl World{
     }
 
     // Generates world of randomized chunks filled with one type of tile
-    fn generate_chunk_mess_world(size: WorldGenerationSize) -> HashMap<ChunkPos, Chunk> {
+    fn generate_chunk_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
         let world_size = Self::get_size_from_type(size);
         let mut chunks = HashMap::new();
 
-        let mut seed = [0u8; 32];
-        seed[0] = 255;
+        let seed = seed_to_byte_array(seed);
         let mut rng = StdRng::from_seed(seed);
         
         for chunk_y in 0..world_size {
@@ -128,11 +128,11 @@ impl World{
     }
 
     // Generates world of randomized tiles
-    fn generate_tile_mess_world(size: WorldGenerationSize) -> HashMap<ChunkPos, Chunk> {
+    fn generate_tile_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
         let world_size = Self::get_size_from_type(size);
         let mut chunks = HashMap::new();
 
-        let seed = [0u8; 32];
+        let seed = seed_to_byte_array(seed);
         let mut rng = StdRng::from_seed(seed);
         
         for chunk_y in 0..world_size {
@@ -149,5 +149,23 @@ impl World{
         }
         return chunks;
     }
+}
 
+
+// Helper funtion for generating seed byte array 
+fn seed_to_byte_array(seed: u32) -> [u8; 32] {
+    let bytes = seed.to_be_bytes();
+    let mut byte_array: [u8; 32] = [0; 32];
+    for (index, _) in bytes.iter().enumerate() {
+    byte_array[index] = bytes[index];
+    }
+    return byte_array;
+}
+
+
+
+// Get chunks that are visible to the camera
+fn get_visible_chunks(camera: &Camera2D, world: &World) -> Vec<ChunkPos> {
+
+    todo!();
 }

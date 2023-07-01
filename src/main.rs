@@ -1,5 +1,3 @@
-use std::{fmt::format, f32::MIN_EXP};
-
 use macroquad::prelude::*;
 use atlas_lookup::*;
 use assets::*;
@@ -16,8 +14,9 @@ async fn main() {
     let mut camera = make_camera();
 
     let world = World::new().generate_world(
-        WorldGenerationType::WaterWorld,
-        WorldGenerationSize::Large,
+        WorldGenerationType::ChunkMess,  
+        WorldGenerationSize::Small,
+        1000
     );
 
     let mut camera_zoom_offset = 1.0;
@@ -45,8 +44,8 @@ async fn main() {
 fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     let camera_speed = 100.0;
     let zoom_speed: f32 = 0.01;
-    let mut max_camera_zoom = 0.1; // Max as in zoomed in, smaller number means wider view
-    let mut min_camera_zoom = 5.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
+    let mut max_camera_zoom = 0.3; // Max as in zoomed in, smaller number means wider view
+    let mut min_camera_zoom = 4.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
     if is_key_down(KeyCode::W) {
         camera.target.y += camera_speed * get_frame_time();
     }
@@ -74,16 +73,6 @@ fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     }
     if zoom_offset < &mut max_camera_zoom {
         *zoom_offset = max_camera_zoom;
-    }
-}
-
-
-fn get_atlas_rect(tile: &Tile) -> Rect{
-    match tile {
-        Tile::Grass => *atlas_lookup::TILE_GRASS,
-        Tile::Water => *atlas_lookup::TILE_WATER,
-        Tile::Stone => *atlas_lookup::TILE_STONE,
-        Tile::Sand  => *atlas_lookup::TILE_SAND,
     }
 }
 
@@ -116,5 +105,14 @@ fn make_camera() -> Camera2D {
         offset: vec2(0.0, 0.0),
         rotation: 0.0,
         viewport: None,
+    }
+}
+
+fn get_atlas_rect(tile: &Tile) -> Rect{
+    match tile {
+        Tile::Grass => *atlas_lookup::TILE_GRASS,
+        Tile::Water => *atlas_lookup::TILE_WATER,
+        Tile::Stone => *atlas_lookup::TILE_STONE,
+        Tile::Sand  => *atlas_lookup::TILE_SAND,
     }
 }
