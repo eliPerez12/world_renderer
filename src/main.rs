@@ -1,5 +1,4 @@
 use macroquad::prelude::*;
-use atlas_lookup::*;
 use assets::*;
 use world::*;
 use utils::*;
@@ -7,6 +6,7 @@ use utils::*;
 mod assets;
 mod world;
 mod utils;
+mod world_generation;
 
 #[macroquad::main("Rendering tests")]
 async fn main() {
@@ -15,23 +15,25 @@ async fn main() {
 
     let mut camera = make_camera();
 
-    let world = World::new().generate_world(
-        WorldGenerationType::SimpleTerrain,  
-        WorldGenerationSize::Small,
+    let mut world = World::new().generate_world(
+        WorldGenerationType::WaterWorld,  
+        WorldGenerationSize::Medium,
         0
     );
 
     let (x, y) = get_tile_pos_in_chunk(17);
     dbg!(x, y);
 
-    let mut camera_zoom_offset = 1.0;
+    let mut camera_zoom_offset = 8.0;
 
     // Main Game loop
     loop {
         /* Update */
-        camera.zoom = vec2(1.0 / screen_width() * TILE_SIZE, 1.0 / screen_height() * TILE_SIZE);
+        camera.zoom = vec2(1.0 / screen_width(), 1.0 / screen_height());
         camera.zoom *= camera_zoom_offset;
         handle_camera_controls(&mut camera, &mut camera_zoom_offset);
+        handle_camera_tile_edits(&camera, &mut world);
+
 
         /* Render */
         set_camera(&camera);

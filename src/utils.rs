@@ -1,7 +1,7 @@
 use crate::World;
 use crate::assets::AssetHandle;
 use crate::assets::atlas_lookup::{TILE_SIZE, self};
-use crate::world::{Tile, WorldGenerationSize};
+use crate::world::{Tile, WorldGenerationSize, GlobalTilePos};
 use macroquad::prelude::*;
 use ::rand::Rng;
 use ::rand::rngs::StdRng;
@@ -39,8 +39,8 @@ pub fn random_tile_water_grass(rng: &mut StdRng) -> Tile {
 pub fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     let camera_speed = 100.0;
     let zoom_speed: f32 = 0.01;
-    let mut max_camera_zoom = 0.3; // Max as in zoomed in, smaller number means wider view
-    let mut min_camera_zoom = 4.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
+    let mut max_camera_zoom = 1.0; // Max as in zoomed in, smaller number means wider view
+    let mut min_camera_zoom = 16.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
     if is_key_down(KeyCode::W) {
         camera.target.y += camera_speed * get_frame_time();
     }
@@ -71,6 +71,33 @@ pub fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     }
 }
 
+pub fn handle_camera_tile_edits(camera: &Camera2D, world: &mut World) {
+    if is_key_down(KeyCode::Key1) {
+        match world.get_tile_mut_mouse(&camera) {
+            Some(tile) => *tile = Tile::Water,
+            None => ()
+        }
+    }
+    if is_key_down(KeyCode::Key2) {
+        match world.get_tile_mut_mouse(&camera) {
+            Some(tile) => *tile = Tile::Grass,
+            None => ()
+        }
+    }
+    if is_key_down(KeyCode::Key3) {
+        match world.get_tile_mut_mouse(&camera) {
+            Some(tile) => *tile = Tile::Sand,
+            None => ()
+        }
+    }
+    if is_key_down(KeyCode::Key4) {
+        match world.get_tile_mut_mouse(&camera) {
+            Some(tile) => *tile = Tile::Stone,
+            None => ()
+        }
+    }
+}
+
 pub fn render_entire_world(world: &World, asset_handle: &AssetHandle) {
     for (chunk_pos, chunk) in world.chunks.iter() {
         for y in 0..16 {
@@ -78,7 +105,7 @@ pub fn render_entire_world(world: &World, asset_handle: &AssetHandle) {
                 draw_texture_ex(    
                     asset_handle.tile_atlas.0, 
                     {(chunk_pos.x as f32 * TILE_SIZE * 16.0) + x as f32 * TILE_SIZE}.round(),
-                    {(-chunk_pos.y as f32 * TILE_SIZE * 16.0) - y as f32 * TILE_SIZE}.round(),
+                    {(-chunk_pos.y as f32 * TILE_SIZE * 16.0) - y as f32 * TILE_SIZE}.round() - TILE_SIZE, 
                     WHITE,
                     DrawTextureParams {
                         dest_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),

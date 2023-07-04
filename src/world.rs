@@ -1,7 +1,9 @@
-use std::collections::HashMap;
-use rand::SeedableRng;
-use rand::rngs::StdRng;
-use crate::utils::*;
+#![allow(dead_code)]
+
+use std::{collections::HashMap, ops::Neg};
+use macroquad::prelude::*;
+
+use crate::assets::atlas_lookup::TILE_SIZE;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub struct ChunkPos {
@@ -41,24 +43,39 @@ pub enum WorldGenerationSize {
     Large,
 }
 
+pub struct GlobalTilePos(pub i32, pub i32);
 
-// Impls
-
-impl Chunk {
-    pub fn get_tile(&self, x: usize, y: usize) -> Option<&Tile> {
-        self.tiles.get(y * 16 + x)
-    }
-
-    pub fn get_tile_mut(&mut self, x: usize, y: usize) -> Option<&mut Tile> {
-        self.tiles.get_mut(y * 16 + x)
-    }
-}
-
+// Standered functions for creating and modifying world
 impl World {
 
     // Returns an empty world
     pub fn new() -> Self {
         return World { chunks: HashMap::new() };
+    }
+
+    // Gets mutable referance to tile from global tile position
+    pub fn get_tile_mut(&mut self, pos: GlobalTilePos) -> Option<&mut Tile> {
+        let chunk_x = pos.0/16;
+        let chunk_y = pos.1/16;
+        let tile_x = pos.0 % 16;
+        let tile_y = pos.1 % 16;
+        if let Some(chunk) = self.chunks.get_mut(&ChunkPos { x: chunk_x, y: chunk_y }) {
+            if let Some(tile) = chunk.tiles.get_mut({tile_x + tile_y * 16} as usize) {
+                return Some(tile)
+            }
+        }
+        None
+    }
+
+    // Gets mutable referance to tile from mouse_position
+    pub fn get_tile_mut_mouse(&mut self, camera: &Camera2D) -> Option<&mut Tile> {
+        let grid_pos = camera.screen_to_world(mouse_position().into()) / TILE_SIZE;
+        let tile = self.get_tile_mut(GlobalTilePos(grid_pos.x as i32, -grid_pos.y as i32));
+        match tile {
+            Some(tile) => return Some(tile),
+            None => (),
+        };
+        None
     }
 
 
@@ -73,127 +90,4 @@ impl World {
 
         return World { chunks };
     }
-
-    fn get_tile_from_chunk(&self, chunk_pos: ChunkPos, tile_x: usize, tile_y: usize) -> Option<&Tile> {
-        self.chunks.get(&chunk_pos)?.get_tile(tile_x, tile_y)
-    }
-
-    fn get_tile_from_chunk_mut(&mut self, chunk_pos: ChunkPos, tile_x: usize, tile_y: usize) -> Option<&mut Tile> {
-        self.chunks.get_mut(&chunk_pos)?.get_tile_mut(tile_x, tile_y)
-    }
-    
 }
-
-// Wolrd generation methods
-impl World{
-
-    // Generates world of just water tiles
-    fn generate_water_world(size: WorldGenerationSize, _seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
-        let mut chunks = HashMap::new();
-        for chunk_y in 0..world_size {
-            for chunk_x in 0..world_size {
-                // Generating individual chunks
-                let mut current_chunk = Vec::new();
-                for _ in 0..16*16 {
-                    current_chunk.push(Tile::Water);
-                }
-                // Insert chunk into chunks hashmap
-                chunks.insert(ChunkPos {x: chunk_x, y: chunk_y}, Chunk { tiles: current_chunk });
-            }
-        }
-        return chunks;
-    }
-
-
-
-
-    // Generates world of randomized chunks filled with one type of tile
-    fn generate_chunk_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
-        let mut chunks = HashMap::new();
-
-        let seed = seed_to_byte_array(seed);
-        let mut rng = StdRng::from_seed(seed);
-        
-        for chunk_y in 0..world_size {
-            for chunk_x in 0..world_size {
-                // Generating individual chunks
-                // Randomize tile used for chunk
-                let current_chunk_tile = random_tile(&mut rng);
-
-                let mut current_chunk = Vec::new();
-                for _ in 0..16*16 {
-                    current_chunk.push(current_chunk_tile.clone());
-                }
-                // Insert chunk into chunks hashmap
-                chunks.insert(ChunkPos {x: chunk_x, y: chunk_y}, Chunk { tiles: current_chunk });
-            }
-        }
-        return chunks;
-    }
-
-    // Generates world of randomized tiles
-    fn generate_tile_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
-        let mut chunks = HashMap::new();
-
-        let seed = seed_to_byte_array(seed);
-        let mut rng = StdRng::from_seed(seed);
-        
-        for chunk_y in 0..world_size {
-            for chunk_x in 0..world_size {
-                // Generating individual chunks
-                let mut current_chunk = Vec::new();
-                for _ in 0..16*16 {
-                    let current_chunk_tile = random_tile(&mut rng);
-                    current_chunk.push(current_chunk_tile.clone());
-                }
-                // Insert chunk into chunks hashmap
-                chunks.insert(ChunkPos {x: chunk_x, y: chunk_y}, Chunk { tiles: current_chunk });
-            }
-        }
-        return chunks;
-    }
-
-    // Generates world of just grass and water, using cellular automata.
-    fn generate_terrain_grass(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
-        let mut chunks = HashMap::new();
-
-        let seed = seed_to_byte_array(seed);
-        let mut rng = StdRng::from_seed(seed);
-        
-        for chunk_y in 0..world_size {
-            for chunk_x in 0..world_size {
-                // Generating individual chunks
-                let mut current_chunk = Vec::new();
-                for _ in 0..16*16 {
-                    let current_chunk_tile = random_tile_water_grass(&mut rng);
-                    current_chunk.push(current_chunk_tile.clone());
-                }
-                // Insert chunk into chunks hashmap
-                chunks.insert(ChunkPos {x: chunk_x, y: chunk_y}, Chunk { tiles: current_chunk });
-            }
-        }
-
-        // Normilize tiles by checking neighbors
-        let chunks_clone = chunks.clone();
-
-        for (chunk_pos, chunk) in chunks {
-            for (index, tile) in chunk.tiles.iter().enumerate() {
-                match tile {
-                    &Tile::Grass => (),
-                    _ => continue,
-                };
-                let mut neighbors = 0;
-                
-                // Top neighbor
-                
-            }
-        }
-        return chunks_clone;
-    }
-}
-
-
