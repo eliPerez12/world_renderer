@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use macroquad::prelude::Camera2D;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use rand::rngs::StdRng;
+use crate::utils::*;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub struct ChunkPos {
@@ -41,6 +41,7 @@ pub enum WorldGenerationSize {
     Large,
 }
 
+
 // Impls
 
 impl Chunk {
@@ -60,15 +61,6 @@ impl World {
         return World { chunks: HashMap::new() };
     }
 
-    // Helper function for getting size of world
-    fn get_size_from_type(size: WorldGenerationSize) -> i32 {
-        match size {
-            WorldGenerationSize::Tiny => 2,
-            WorldGenerationSize::Small => 4,
-            WorldGenerationSize::Medium => 8,
-            WorldGenerationSize::Large => 20,
-        }
-    }
 
     // Populates a world with tiles, with diffrent world types able to be generated
     pub fn generate_world(self, generation_type: WorldGenerationType, size: WorldGenerationSize, seed: u32) -> Self {
@@ -97,7 +89,7 @@ impl World{
 
     // Generates world of just water tiles
     fn generate_water_world(size: WorldGenerationSize, _seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = Self::get_size_from_type(size);
+        let world_size = get_size_from_type(size);
         let mut chunks = HashMap::new();
         for chunk_y in 0..world_size {
             for chunk_x in 0..world_size {
@@ -113,28 +105,12 @@ impl World{
         return chunks;
     }
 
-    fn random_tile(rng: &mut StdRng) -> Tile{
-        match rng.gen_range(1..5) {
-            1 => Tile::Water,
-            2 => Tile::Grass,
-            3 => Tile::Stone,
-            4 => Tile::Sand,
-            _ =>  unreachable!()
-        }
-    }
 
-    // Generates either grass or water tile
-    fn random_tile_water_grass(rng: &mut StdRng) -> Tile {
-        match rng.gen_range(1..=2) {
-            1 => Tile::Water,
-            2 => Tile::Grass,
-            _ => unreachable!(),
-        }
-    }
+
 
     // Generates world of randomized chunks filled with one type of tile
     fn generate_chunk_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = Self::get_size_from_type(size);
+        let world_size = get_size_from_type(size);
         let mut chunks = HashMap::new();
 
         let seed = seed_to_byte_array(seed);
@@ -144,7 +120,7 @@ impl World{
             for chunk_x in 0..world_size {
                 // Generating individual chunks
                 // Randomize tile used for chunk
-                let current_chunk_tile = Self::random_tile(&mut rng);
+                let current_chunk_tile = random_tile(&mut rng);
 
                 let mut current_chunk = Vec::new();
                 for _ in 0..16*16 {
@@ -159,7 +135,7 @@ impl World{
 
     // Generates world of randomized tiles
     fn generate_tile_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = Self::get_size_from_type(size);
+        let world_size = get_size_from_type(size);
         let mut chunks = HashMap::new();
 
         let seed = seed_to_byte_array(seed);
@@ -170,7 +146,7 @@ impl World{
                 // Generating individual chunks
                 let mut current_chunk = Vec::new();
                 for _ in 0..16*16 {
-                    let current_chunk_tile = Self::random_tile(&mut rng);
+                    let current_chunk_tile = random_tile(&mut rng);
                     current_chunk.push(current_chunk_tile.clone());
                 }
                 // Insert chunk into chunks hashmap
@@ -182,7 +158,7 @@ impl World{
 
     // Generates world of just grass and water, using cellular automata.
     fn generate_terrain_grass(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = Self::get_size_from_type(size);
+        let world_size = get_size_from_type(size);
         let mut chunks = HashMap::new();
 
         let seed = seed_to_byte_array(seed);
@@ -193,7 +169,7 @@ impl World{
                 // Generating individual chunks
                 let mut current_chunk = Vec::new();
                 for _ in 0..16*16 {
-                    let current_chunk_tile = Self::random_tile_water_grass(&mut rng);
+                    let current_chunk_tile = random_tile_water_grass(&mut rng);
                     current_chunk.push(current_chunk_tile.clone());
                 }
                 // Insert chunk into chunks hashmap
@@ -204,28 +180,20 @@ impl World{
         // Normilize tiles by checking neighbors
         let chunks_clone = chunks.clone();
 
-        for (chunkpos, chunk) in chunks {
+        for (chunk_pos, chunk) in chunks {
             for (index, tile) in chunk.tiles.iter().enumerate() {
                 match tile {
                     &Tile::Grass => (),
                     _ => continue,
                 };
                 let mut neighbors = 0;
+                
+                // Top neighbor
+                
             }
         }
-        
-
         return chunks_clone;
     }
 }
 
 
-// Helper funtion for generating seed byte array 
-fn seed_to_byte_array(seed: u32) -> [u8; 32] {
-    let bytes = seed.to_be_bytes();
-    let mut byte_array: [u8; 32] = [0; 32];
-    for (index, _) in bytes.iter().enumerate() {
-    byte_array[index] = bytes[index];
-    }
-    return byte_array;
-}
