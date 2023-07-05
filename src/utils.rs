@@ -1,7 +1,7 @@
 use crate::World;
 use crate::assets::AssetHandle;
 use crate::assets::atlas_lookup::{TILE_SIZE, self};
-use crate::world::{Tile, WorldGenerationSize, GlobalTilePos};
+use crate::world::{Tile, WorldGenerationSize};
 use macroquad::prelude::*;
 use ::rand::Rng;
 use ::rand::rngs::StdRng;

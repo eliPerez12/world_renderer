@@ -8,6 +8,11 @@ mod world;
 mod utils;
 mod world_generation;
 
+
+// TODO: Add selective rendering for chunks
+// NOTE:
+
+
 #[macroquad::main("Rendering tests")]
 async fn main() {
     // Initilizing game
@@ -45,6 +50,3 @@ async fn main() {
         next_frame().await;
     }
 }
-
-
-
