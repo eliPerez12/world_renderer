@@ -46,7 +46,7 @@ impl World{
                     current_chunk.push(current_chunk_tile.clone());
                 }
                 // Insert chunk into chunks hashmap
-                chunks.insert(ChunkPos {x: chunk_x, y: chunk_y}, Chunk { tiles: current_chunk });
+                chunks.insert(ChunkPos {x: chunk_x , y: chunk_y}, Chunk { tiles: current_chunk });
             }
         }
         return chunks;

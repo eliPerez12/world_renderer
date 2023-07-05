@@ -42,7 +42,7 @@ pub enum WorldGenerationSize {
     Large,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct GlobalTilePos(pub i32, pub i32);
 
 // Standered functions for creating and modifying world
@@ -51,6 +51,13 @@ impl World {
     // Returns an empty world
     pub fn new() -> Self {
         return World { chunks: HashMap::new() };
+    }
+
+    pub fn contains_tile(&self, global_pos: &GlobalTilePos) -> bool {
+        match self.get_tile(global_pos) {
+            Some(_) => true,
+            None => false,
+        }
     }
 
     // Populates a world with tiles, with diffrent world types able to be generated
@@ -66,9 +73,10 @@ impl World {
     }
 
     // Gets immutable referance to tile from global tile position
-    fn get_tile(&self, pos: &GlobalTilePos) -> Option<&Tile> {
-        let chunk_x = pos.0/16;
-        let chunk_y = pos.1/16;
+    pub fn get_tile(&self, pos: &GlobalTilePos) -> Option<&Tile> {
+        let chunk_x = if pos.0 < 0 { (pos.0 - 15) / 16 } else { pos.0 / 16 };
+        let chunk_y = if pos.1 < 0 { (pos.1 - 15) / 16 } else { pos.1 / 16 };
+        
         let tile_x = pos.0 % 16;
         let tile_y = pos.1 % 16;
         if let Some(chunk) = self.chunks.get(&ChunkPos { x: chunk_x, y: chunk_y }) {
@@ -80,9 +88,10 @@ impl World {
     }
 
     // Gets mutable referance to tile from global tile position
-    fn get_tile_mut(&mut self, pos: &GlobalTilePos) -> Option<&mut Tile> {
-        let chunk_x = pos.0/16;
-        let chunk_y = pos.1/16;
+    pub fn get_tile_mut(&mut self, pos: &GlobalTilePos) -> Option<&mut Tile> {
+        let chunk_x = if pos.0 < 0 { (pos.0 - 15) / 16 } else { pos.0 / 16 };
+        let chunk_y = if pos.1 < 0 { (pos.1 - 15) / 16 } else { pos.1 / 16 };
+        
         let tile_x = pos.0 % 16;
         let tile_y = pos.1 % 16;
         if let Some(chunk) = self.chunks.get_mut(&ChunkPos { x: chunk_x, y: chunk_y }) { // If tile exists in world
@@ -104,7 +113,6 @@ impl World {
         None
     }
 
-    // Gets tiles that are visble to the camera
     fn get_visible_tiles(&self, camera: &Camera2D) -> Vec<GlobalTilePos> {
         let top_left_world_pos = camera.screen_to_world(Vec2 {x: 0.0, y: 0.0});
         let bottom_right_world_pos = camera.screen_to_world(
@@ -113,8 +121,8 @@ impl World {
         let top_left_grid_pos = top_left_world_pos / 8.0;
         let bottom_right_grid_pos = bottom_right_world_pos / 8.0;
         let mut visible_tiles: Vec<GlobalTilePos> = Vec::new();
-        for y in -top_left_grid_pos.y as i32 .. -bottom_right_grid_pos.y as i32 + 1 {
-            for x in top_left_grid_pos.x as i32  .. bottom_right_grid_pos.x as i32 + 2 {
+        for y in -top_left_grid_pos.y as i32 ..=-bottom_right_grid_pos.y as i32 + 2 {
+            for x in top_left_grid_pos.x as i32 ..=bottom_right_grid_pos.x as i32 + 2 {
                 visible_tiles.push(GlobalTilePos(x, y));
             }
         }
@@ -131,7 +139,9 @@ impl World {
     pub fn render_visible_tiles(&self, camera: &Camera2D, asset_handle: &AssetHandle) {
         let visible_tiles = self.get_visible_tiles(&camera);
         for global_pos in &visible_tiles {
-            self.render_tile(&asset_handle, global_pos);
+            if self.contains_tile(global_pos) {
+                self.render_tile(&asset_handle, global_pos);
+            }
         }
     }
 
@@ -142,8 +152,8 @@ impl World {
         if let Some(tile) = self.get_tile(global_pos) {
             draw_texture_ex(    
                 asset_handle.tile_atlas.0, 
-                {x as f32 * TILE_SIZE}.round() - TILE_SIZE,
-                {- y as f32 * TILE_SIZE}.round() - TILE_SIZE, 
+                {x as f32 * TILE_SIZE}.round(),
+                {-y as f32 * TILE_SIZE}.round() - TILE_SIZE, 
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
@@ -153,7 +163,7 @@ impl World {
                 }
             );
         } else {
-            // Render nothing
+
         }
     }
 }

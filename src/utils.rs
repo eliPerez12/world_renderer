@@ -142,7 +142,7 @@ pub fn get_atlas_rect(tile: &Tile) -> Rect{
 // Lookup for getting size of the world when generating
 pub fn get_size_from_type(size: WorldGenerationSize) -> i32 {
     match size {
-        WorldGenerationSize::Tiny => 2,
+        WorldGenerationSize::Tiny => 1,
         WorldGenerationSize::Small => 4,
         WorldGenerationSize::Medium => 8,
         WorldGenerationSize::Large => 20,
