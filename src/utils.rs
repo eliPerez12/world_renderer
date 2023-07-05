@@ -27,14 +27,6 @@ pub fn random_tile(rng: &mut StdRng) -> Tile{
     }
 }
 
-// Generates either grass or water tile
-pub fn random_tile_water_grass(rng: &mut StdRng) -> Tile {
-    match rng.gen_range(1..=2) {
-        1 => Tile::Water,
-        2 => Tile::Grass,
-        _ => unreachable!(),
-    }
-}
 
 pub fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
     let camera_speed = 100.0;

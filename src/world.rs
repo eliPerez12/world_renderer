@@ -32,7 +32,6 @@ pub enum WorldGenerationType {
     WaterWorld,
     ChunkMess,
     TileMess,
-    SimpleTerrain
 }
 
 pub enum WorldGenerationSize {
@@ -66,7 +65,6 @@ impl World {
             WorldGenerationType::WaterWorld => Self::generate_water_world(size, seed),
             WorldGenerationType::ChunkMess => Self::generate_chunk_mess_world(size, seed),
             WorldGenerationType::TileMess => Self::generate_tile_mess_world(size, seed),
-            WorldGenerationType::SimpleTerrain => Self::generate_terrain_grass(size, seed),
         };
 
         return World { chunks };
