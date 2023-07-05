@@ -10,7 +10,7 @@ mod world_generation;
 
 
 // TODO: Add selective rendering for chunks
-// NOTE:
+// NOTE: Test
 
 
 #[macroquad::main("Rendering tests")]
