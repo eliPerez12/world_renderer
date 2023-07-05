@@ -16,7 +16,7 @@ async fn main() {
     let mut camera = make_camera();
 
     let mut world = World::new().generate_world(
-        WorldGenerationType::WaterWorld,  
+        WorldGenerationType::ChunkMess,  
         WorldGenerationSize::Medium,
         1797390122,
     );
