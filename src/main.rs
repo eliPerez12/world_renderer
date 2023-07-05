@@ -8,11 +8,6 @@ mod world;
 mod utils;
 mod world_generation;
 
-
-// TODO: Add selective rendering for chunks
-// NOTE: Test
-
-
 #[macroquad::main("Rendering tests")]
 async fn main() {
     // Initilizing game
@@ -21,15 +16,13 @@ async fn main() {
     let mut camera = make_camera();
 
     let mut world = World::new().generate_world(
-        WorldGenerationType::WaterWorld,  
+        WorldGenerationType::TileMess,  
         WorldGenerationSize::Medium,
-        0
+        1797390122,
     );
 
-    let (x, y) = get_tile_pos_in_chunk(17);
-    dbg!(x, y);
-
     let mut camera_zoom_offset = 8.0;
+
 
     // Main Game loop
     loop {
@@ -39,10 +32,9 @@ async fn main() {
         handle_camera_controls(&mut camera, &mut camera_zoom_offset);
         handle_camera_tile_edits(&camera, &mut world);
 
-
         /* Render */
         set_camera(&camera);
-        render_entire_world(&world, &asset_handle);
+        world.render_visible_tiles(&camera, &asset_handle);
 
         // UI
         set_default_camera(); // Sets camera to defualt camera, used for ui rendering.

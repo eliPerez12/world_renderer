@@ -98,7 +98,7 @@ pub fn handle_camera_tile_edits(camera: &Camera2D, world: &mut World) {
     }
 }
 
-pub fn render_entire_world(world: &World, asset_handle: &AssetHandle) {
+pub fn _render_entire_world(world: &World, asset_handle: &AssetHandle) {
     for (chunk_pos, chunk) in world.chunks.iter() {
         for y in 0..16 {
             for x in 0..16 {
@@ -147,10 +147,4 @@ pub fn get_size_from_type(size: WorldGenerationSize) -> i32 {
         WorldGenerationSize::Medium => 8,
         WorldGenerationSize::Large => 20,
     }
-}
-
-pub fn get_tile_pos_in_chunk(pos: i32) -> (i32, i32) {
-    let y = pos / 16;
-    let x = pos % 16;
-    return (x, y);
 }
