@@ -16,13 +16,15 @@ async fn main() {
     let mut camera = make_camera();
 
     let mut world = World::new().generate_world(
-        WorldGenerationType::WaterWorld,  
+        WorldGenerationType::PerlinTerrain,  
         WorldGenerationSize::Medium,
-        1797390122,
+        WorldIslandSize::Small,
+        0,
     );
 
-    let mut camera_zoom_offset = 8.0;
+    set_fullscreen(true);
 
+    let mut camera_zoom_offset = 8.0;
 
     // Main Game loop
     loop { 

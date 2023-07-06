@@ -1,7 +1,7 @@
 use crate::World;
 use crate::assets::AssetHandle;
 use crate::assets::atlas_lookup::{TILE_SIZE, self};
-use crate::world::{Tile, WorldGenerationSize};
+use crate::world::Tile;
 use macroquad::prelude::*;
 use ::rand::Rng;
 use ::rand::rngs::StdRng;
@@ -29,7 +29,7 @@ pub fn random_tile(rng: &mut StdRng) -> Tile{
 
 
 pub fn handle_camera_controls(camera: &mut Camera2D, zoom_offset: &mut f32) {
-    let camera_speed = 100.0;
+    let camera_speed = 1.0  / {camera.zoom.x + camera.zoom.y}; // Pan speed increases with less zoom
     let zoom_speed: f32 = 0.01;
     let mut max_camera_zoom = 1.0; // Max as in zoomed in, smaller number means wider view
     let mut min_camera_zoom = 16.0; // These are not actually mutable, they are like that so they can interact with the zoom offset better
@@ -128,15 +128,5 @@ pub fn get_atlas_rect(tile: &Tile) -> Rect{
         Tile::Water => *atlas_lookup::TILE_WATER,
         Tile::Stone => *atlas_lookup::TILE_STONE,
         Tile::Sand  => *atlas_lookup::TILE_SAND,
-    }
-}
-
-// Lookup for getting size of the world when generating
-pub fn get_size_from_type(size: WorldGenerationSize) -> i32 {
-    match size {
-        WorldGenerationSize::Tiny => 1,
-        WorldGenerationSize::Small => 4,
-        WorldGenerationSize::Medium => 8,
-        WorldGenerationSize::Large => 20,
     }
 }

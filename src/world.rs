@@ -32,13 +32,26 @@ pub enum WorldGenerationType {
     WaterWorld,
     ChunkMess,
     TileMess,
+    PerlinTerrain
 }
 
 pub enum WorldGenerationSize {
-    Tiny,
-    Small,
-    Medium,
-    Large,
+    Tiny = 2,
+    Small = 5,
+    Medium = 15,
+    Large = 25,
+    Huge = 50,
+    Titanic = 125,
+}
+
+#[derive(Clone, Copy)]
+pub enum WorldIslandSize {
+    Tiny = 2,
+    Small = 4,
+    Medium = 6,
+    Large = 9,
+    Huge = 12,
+    Titanic = 15,
 }
 
 #[derive(Debug, PartialEq)]
@@ -60,11 +73,18 @@ impl World {
     }
 
     // Populates a world with tiles, with diffrent world types able to be generated
-    pub fn generate_world(self, generation_type: WorldGenerationType, size: WorldGenerationSize, seed: u32) -> Self {
+    pub fn generate_world(
+        self,
+        generation_type: WorldGenerationType,
+        size: WorldGenerationSize,
+        island_size: WorldIslandSize,
+        seed: u32,
+    ) -> Self {
         let chunks = match generation_type {
             WorldGenerationType::WaterWorld => Self::generate_water_world(size, seed),
             WorldGenerationType::ChunkMess => Self::generate_chunk_mess_world(size, seed),
             WorldGenerationType::TileMess => Self::generate_tile_mess_world(size, seed),
+            WorldGenerationType::PerlinTerrain => Self::generate_perlin_noise_world(size, seed, island_size),
         };
 
         return World { chunks };

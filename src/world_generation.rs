@@ -1,7 +1,8 @@
 use std::collections::HashMap;
-
 use rand::SeedableRng;
 use rand::rngs::StdRng;
+use noise::{Fbm, Perlin};
+use noise::utils::{NoiseMapBuilder, PlaneMapBuilder};
 
 use crate::world::*;
 use crate::utils::*;
@@ -11,7 +12,7 @@ impl World{
 
     // Generates world of just water tiles
     pub fn generate_water_world(size: WorldGenerationSize, _seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
+        let world_size = size as i32;
         let mut chunks = HashMap::new();
         for chunk_y in 0..world_size {
             for chunk_x in 0..world_size {
@@ -29,7 +30,7 @@ impl World{
 
     // Generates world of randomized chunks filled with one type of tile
     pub fn generate_chunk_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
+        let world_size = size as i32;
         let mut chunks = HashMap::new();
 
         let seed = seed_to_byte_array(seed);
@@ -54,7 +55,7 @@ impl World{
 
     // Generates world of randomized tiles
     pub fn generate_tile_mess_world(size: WorldGenerationSize, seed: u32) -> HashMap<ChunkPos, Chunk> {
-        let world_size = get_size_from_type(size);
+        let world_size = size as i32;
         let mut chunks = HashMap::new();
 
         let seed = seed_to_byte_array(seed);
@@ -75,7 +76,46 @@ impl World{
         return chunks;
     }
 
-    pub fn generate_perlin_noise_world() {
+    pub fn generate_perlin_noise_world(size: WorldGenerationSize, seed: u32, island_size: WorldIslandSize) -> HashMap<ChunkPos, Chunk> {
+        let fbm = Fbm::<Perlin>::new(seed);
+        let size = size as i32;
+        let mut map = HashMap::new();
 
+        let plane = PlaneMapBuilder::<_, 2>::new(&fbm)
+                .set_size(size as usize * 16, size as usize * 16)
+                .set_x_bounds(
+                    -size as f64 / island_size as i64 as f64,
+                     size as f64 / island_size as i64 as f64,
+                )
+                .set_y_bounds(
+                    -size as f64 / island_size as i64 as f64, 
+                     size as f64 / island_size as i64 as f64,
+                )
+                .build();
+
+        let water_level = 0.0;
+
+        for chunk_y in 0..size {
+            for chunk_x in 0..size {
+                let mut chunk = Chunk {tiles: vec![]};
+                for y in 0..16 {
+                    for x in 0..16 {
+                        let pixel = plane.get_value({chunk_x * 16 + x } as usize, {chunk_y * 16 + y} as usize);
+                        let pixel = {2.0 * pixel + 0.5}.round();
+                        let tile = match pixel {
+                            _ if pixel < water_level => Tile::Water,
+                            _ if pixel > 2.0 => Tile::Stone,
+                            _ if pixel >= 1.3 && pixel <= 2.0 => Tile::Grass,
+                            _ if pixel >= 1.0 && pixel <= 1.3 => Tile::Sand,
+
+                            _ => Tile::Water,
+                        };
+                        chunk.tiles.push(tile);
+                    }
+                }
+                map.insert(ChunkPos {x: chunk_x, y: chunk_y}, chunk);
+            }
+        }
+        map
     }
 }
