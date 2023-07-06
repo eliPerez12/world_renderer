@@ -16,6 +16,9 @@ pub enum Tile {
     Stone,
     Sand,
     Water,
+    ShallowWater,
+    DeepWater,
+    DarkStone,
 }
 
 #[derive(Debug, Clone)]
@@ -48,10 +51,20 @@ pub enum WorldGenerationSize {
 pub enum WorldIslandSize {
     Tiny = 2,
     Small = 4,
-    Medium = 6,
-    Large = 9,
-    Huge = 12,
+    Medium = 5,
+    Large = 8,
+    Huge = 11,
     Titanic = 15,
+}
+
+pub struct PerlinWorldSettings {
+    pub water_level: f64,
+    pub sand_level: f64,
+    pub grass_level: f64,
+    pub stone_level: f64,
+
+    pub height_scale_factor: f64
+
 }
 
 #[derive(Debug, PartialEq)]

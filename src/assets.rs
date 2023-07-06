@@ -40,6 +40,8 @@ pub mod atlas_lookup {
     pub static TILE_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 0));
     pub static TILE_SAND:  Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 0));     
     pub static TILE_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 0));
+    pub static TILE_SHALLOW_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 1));
+    pub static TILE_DEEP_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 1));
+    pub static TILE_DARK_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 1));
 }
-
 

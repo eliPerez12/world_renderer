@@ -12,14 +12,14 @@ mod world_generation;
 async fn main() {
     // Initilizing game
     let asset_handle: AssetHandle = AssetHandle::new();
-
+  
     let mut camera = make_camera();
 
     let mut world = World::new().generate_world(
         WorldGenerationType::PerlinTerrain,  
-        WorldGenerationSize::Medium,
-        WorldIslandSize::Small,
-        0,
+        WorldGenerationSize::Large,
+        WorldIslandSize::Large,
+        1,
     );
 
     set_fullscreen(true);

@@ -128,5 +128,8 @@ pub fn get_atlas_rect(tile: &Tile) -> Rect{
         Tile::Water => *atlas_lookup::TILE_WATER,
         Tile::Stone => *atlas_lookup::TILE_STONE,
         Tile::Sand  => *atlas_lookup::TILE_SAND,
+        Tile::ShallowWater => *atlas_lookup::TILE_SHALLOW_WATER,
+        Tile::DeepWater => *atlas_lookup::TILE_DEEP_WATER,
+        Tile::DarkStone => *atlas_lookup::TILE_DARK_STONE,
     }
 }

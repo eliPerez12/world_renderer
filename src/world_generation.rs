@@ -93,7 +93,17 @@ impl World{
                 )
                 .build();
 
-        let water_level = 0.0;
+        let water_level = 1.0;
+        let sand_level = 1.29;
+        let grass_level = 2.0;
+        let stone_level = 2.3;
+        let dark_stone_level = 3.0;
+
+        let shallow_water_level = 0.20;
+        let deep_water_level = -0.55;
+
+        let max_height = dark_stone_level; //TODO: Set to deep water
+        let height_scale_factor = 1.9;
 
         for chunk_y in 0..size {
             for chunk_x in 0..size {
@@ -101,14 +111,20 @@ impl World{
                 for y in 0..16 {
                     for x in 0..16 {
                         let pixel = plane.get_value({chunk_x * 16 + x } as usize, {chunk_y * 16 + y} as usize);
-                        let pixel = {2.0 * pixel + 0.5}.round();
+                        let pixel = {height_scale_factor * pixel};
                         let tile = match pixel {
-                            _ if pixel < water_level => Tile::Water,
-                            _ if pixel > 2.0 => Tile::Stone,
-                            _ if pixel >= 1.3 && pixel <= 2.0 => Tile::Grass,
-                            _ if pixel >= 1.0 && pixel <= 1.3 => Tile::Sand,
+                            // Land
+                            _ if pixel > max_height => Tile::DarkStone,  // Handles for anything above the max height, makes it dark stone
+                            _ if pixel >= stone_level && pixel < max_height => Tile::DarkStone,  
+                            _ if pixel >= grass_level && pixel < stone_level => Tile::Stone,   
+                            _ if pixel >= sand_level && pixel < grass_level => Tile::Grass,
+                            _ if pixel >= water_level && pixel < sand_level => Tile::Sand,
+                            
+                            // Water
+                            _ if pixel < water_level && pixel >= shallow_water_level => Tile::ShallowWater,
+                            _ if pixel < shallow_water_level && pixel >= deep_water_level => Tile::Water,
 
-                            _ => Tile::Water,
+                            _ => Tile::DeepWater,
                         };
                         chunk.tiles.push(tile);
                     }
