@@ -1,4 +1,7 @@
-use macroquad::{texture::{Texture2D, FilterMode}, prelude::ImageFormat};
+use macroquad::{
+    prelude::ImageFormat,
+    texture::{FilterMode, Texture2D},
+};
 
 // Spritesheet for the tiles
 pub struct TileAtlas(pub Texture2D);
@@ -9,8 +12,9 @@ pub struct AssetHandle {
 
 impl AssetHandle {
     pub fn new() -> Self {
-        let embedded_tile_atlas = Self::load_embedded_asset(include_bytes!("assets\\tiles\\tile_atlas_padded.png"));
-        AssetHandle { 
+        let embedded_tile_atlas =
+            Self::load_embedded_asset(include_bytes!("assets\\tiles\\tile_atlas_padded.png"));
+        AssetHandle {
             tile_atlas: TileAtlas(embedded_tile_atlas),
         }
     }
@@ -32,17 +36,16 @@ pub mod atlas_lookup {
         let y = (y as f32 * (TILE_SIZE + 2.0)) + 1.0;
         Rect::new(x, y, TILE_SIZE, TILE_SIZE)
     }
-    
+
     // Tiles
-    pub const TILE_SIZE: f32 = 8.0;
+    pub const TILE_SIZE: f32 = 8.0; // Tile size in pixels
 
     pub const TILE_GRASS: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 0));
     pub const TILE_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 0));
-    pub const TILE_SAND:  Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 0));     
+    pub const TILE_SAND: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 0));
     pub const TILE_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 0));
     pub const TILE_SHALLOW_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 1));
     pub const TILE_DEEP_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 1));
     pub const TILE_DARK_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 1));
     pub const TILE_SNOW: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 1));
 }
-
