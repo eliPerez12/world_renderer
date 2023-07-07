@@ -17,9 +17,9 @@ async fn main() {
 
     let mut world = World::new().generate_world(
         WorldGenerationType::PerlinTerrain,  
-        WorldGenerationSize::Large,
+        WorldGenerationSize::Titanic,
         WorldIslandSize::Large,
-        1,
+        25,
     );
 
     set_fullscreen(true);

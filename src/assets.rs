@@ -36,12 +36,13 @@ pub mod atlas_lookup {
     // Tiles
     pub const TILE_SIZE: f32 = 8.0;
 
-    pub static TILE_GRASS: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 0));
-    pub static TILE_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 0));
-    pub static TILE_SAND:  Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 0));     
-    pub static TILE_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 0));
-    pub static TILE_SHALLOW_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 1));
-    pub static TILE_DEEP_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 1));
-    pub static TILE_DARK_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 1));
+    pub const TILE_GRASS: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 0));
+    pub const TILE_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 0));
+    pub const TILE_SAND:  Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 0));     
+    pub const TILE_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 0));
+    pub const TILE_SHALLOW_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(0, 1));
+    pub const TILE_DEEP_WATER: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(1, 1));
+    pub const TILE_DARK_STONE: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(2, 1));
+    pub const TILE_SNOW: Lazy<Rect> = Lazy::new(|| define_pos_in_atlas(3, 1));
 }
 

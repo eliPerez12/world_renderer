@@ -95,14 +95,15 @@ impl World{
 
         let water_level = 1.0;
         let sand_level = 1.29;
-        let grass_level = 2.0;
-        let stone_level = 2.3;
-        let dark_stone_level = 3.0;
+        let grass_level = 1.8;
+        let stone_level = 2.0;
+        let dark_stone_level = 2.5;
+        let snow_level = 3.0;
 
-        let shallow_water_level = 0.20;
+        let shallow_water_level = 0.30;
         let deep_water_level = -0.55;
 
-        let max_height = dark_stone_level; //TODO: Set to deep water
+        let max_height = snow_level; //TODO: Set to deep water
         let height_scale_factor = 1.9;
 
         for chunk_y in 0..size {
@@ -114,8 +115,9 @@ impl World{
                         let pixel = {height_scale_factor * pixel};
                         let tile = match pixel {
                             // Land
-                            _ if pixel > max_height => Tile::DarkStone,  // Handles for anything above the max height, makes it dark stone
-                            _ if pixel >= stone_level && pixel < max_height => Tile::DarkStone,  
+                            _ if pixel > max_height => Tile::Snow,  // Handles for anything above the max height, makes it dark stone
+                            _ if pixel >= dark_stone_level && pixel < max_height => Tile::Snow,  
+                            _ if pixel >= stone_level && pixel < dark_stone_level => Tile::DarkStone,  
                             _ if pixel >= grass_level && pixel < stone_level => Tile::Stone,   
                             _ if pixel >= sand_level && pixel < grass_level => Tile::Grass,
                             _ if pixel >= water_level && pixel < sand_level => Tile::Sand,

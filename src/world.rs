@@ -19,6 +19,7 @@ pub enum Tile {
     ShallowWater,
     DeepWater,
     DarkStone,
+    Snow,
 }
 
 #[derive(Debug, Clone)]
